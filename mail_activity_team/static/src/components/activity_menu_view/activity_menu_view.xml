@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
-    <t
-        t-name="mail.ActivityMenu"
-        t-inherit="mail.ActivityMenu"
-        t-inherit-mode="extension"
-    >
+    <t t-name="ActivityMenu" t-inherit="mail.ActivityMenu" t-inherit-mode="extension">
         <xpath expr="//div[1]" position="before">
             <div
                 t-ref="mail_activity_team_dropdown"
@@ -38,8 +34,15 @@
             position="replace"
         >
             <span class="o-mail-ActivityMenu-counter badge rounded-pill">
-                <t t-esc="store.activityCounter" />
-                <t t-if="this.teamCounter > 0">/<t t-esc="this.teamCounter" /></t>
+                <t t-if="store.activityCounter">
+                    <t t-esc="store.activityCounter" />
+                </t>
+                <t t-if="store.activityCounter and this.teamCounter">
+                /
+                </t>
+                <t t-if="this.teamCounter > 0">
+                    <t t-esc="this.teamCounter" />
+                </t>
             </span>
         </xpath>
     </t>
