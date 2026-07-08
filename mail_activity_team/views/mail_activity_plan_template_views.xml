@@ -6,6 +6,12 @@
         <field name="arch" type="xml">
             <field name="responsible_id" position="after">
                 <field
+                    name="activity_team_user_id"
+                    invisible="not activity_team_required"
+                    options="{'no_create': True}"
+                    domain="[('activity_team_ids', '=', activity_team_id)]"
+                />
+                <field
                     name="activity_team_id"
                     invisible="not activity_team_required"
                     required="activity_team_required"
