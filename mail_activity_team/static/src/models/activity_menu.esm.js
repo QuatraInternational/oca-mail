@@ -2,10 +2,12 @@ import {onWillStart, useRef} from "@odoo/owl";
 import {user} from "@web/core/user";
 import {ActivityMenu} from "@mail/core/web/activity_menu";
 import {patch} from "@web/core/utils/patch";
+import {useService} from "@web/core/utils/hooks";
 
 patch(ActivityMenu.prototype, {
     setup() {
         super.setup();
+        this.orm = useService("orm");
         this.currentFilter = "my";
         this.rootRef = useRef("mail_activity_team_dropdown");
         this.teamActivityCount = 0;

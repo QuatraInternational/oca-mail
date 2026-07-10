@@ -5,12 +5,21 @@ from odoo.exceptions import ValidationError
 class MailActivityPlanTemplate(models.Model):
     _inherit = "mail.activity.plan.template"
 
+    activity_team_user_id = fields.Many2one(
+        comodel_name="res.users",
+        compute="_compute_activity_team_user_id",
+        readonly=False,
+        help="The team member that the activity will be assigned to specifically",
+        store=True,
+        string="Team user",
+    )
     activity_team_id = fields.Many2one(
         comodel_name="mail.activity.team",
         compute="_compute_activity_team_id",
         ondelete="restrict",
         readonly=False,
         store=True,
+        string="Team assigned to",
     )
     activity_team_required = fields.Boolean(
         compute="_compute_activity_team_required",
@@ -32,6 +41,26 @@ class MailActivityPlanTemplate(models.Model):
         """Hook to override requiredness of activity team"""
         for template in self:
             template.activity_team_required = template.responsible_type == "team"
+
+    @api.depends("activity_team_id", "responsible_type")
+    def _compute_activity_team_user_id(self):
+        """Ensure consistency between the activity team and the team user"""
+        for template in self:
+            user = template.activity_team_user_id
+            if template.activity_team_required:
+                team = template.activity_team_id
+                if team:
+                    if not user or user not in team.member_ids:
+                        if team.user_id:
+                            template.activity_team_user_id = team.user_id
+                        elif len(team.member_ids) == 1:
+                            template.activity_team_user_id = team.member_ids
+                        elif user:
+                            template.activity_team_user_id = False
+                elif user:
+                    template.activity_team_user_id = False
+            elif user:
+                template.activity_team_user_id = False
 
     @api.depends("activity_type_id", "responsible_type")
     def _compute_activity_team_id(self):

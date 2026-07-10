@@ -45,6 +45,11 @@ class MailActivityTeam(models.Model):
         string="Team Members",
     )
     user_id = fields.Many2one(comodel_name="res.users", string="Team Leader")
+    notify_members = fields.Boolean(
+        default=False,
+        help="When enabled, all team members will be notified "
+        "when an activity is assigned to this team.",
+    )
     count_missing_activities = fields.Integer(
         string="Missing Activities", compute="_compute_missing_activities", default=0
     )
@@ -52,9 +57,7 @@ class MailActivityTeam(models.Model):
     @api.onchange("user_id")
     def _onchange_user_id(self):
         if self.user_id and self.user_id not in self.member_ids:
-            members_ids = self.member_ids.ids
-            members_ids.append(self.user_id.id)
-            self.member_ids = [(4, member) for member in members_ids]
+            self.member_ids += self.user_id
 
     def assign_team_to_unassigned_activities(self):
         activity_model = self.env["mail.activity"]
